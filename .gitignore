@@ -1,0 +1,31 @@
+# Global ignores
+.DS_Store
+node_modules/
+.env
+*.log
+__pycache__/
+*.pyc
+.vscode/
+.idea/
+
+# Backend (Django)
+backend/db.sqlite3
+backend/.env
+backend/media/
+backend/staticfiles/
+backend/venv/
+backend/migrations/
+
+# Frontend (React/Vite/Next.js)
+frontend/node_modules/
+frontend/.next/
+frontend/.env
+frontend/dist/
+frontend/build/
+
+# Git and system files
+*.swp
+*.swo
+*.bak
+*.tmp
+*.lock
