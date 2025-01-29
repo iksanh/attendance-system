@@ -16,6 +16,7 @@ backend/staticfiles/
 backend/venv/
 backend/migrations/
 
+
 # Frontend (React/Vite/Next.js)
 frontend/node_modules/
 frontend/.next/
