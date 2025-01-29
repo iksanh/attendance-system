@@ -2,3 +2,5 @@ Django==4.2
 djangorestframework
 django-cors-headers
 pyyaml
+psycopg2
+python-dotenv
