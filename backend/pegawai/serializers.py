@@ -6,3 +6,5 @@ class PegawaiSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pegawai
         fields = '__all__'
+
+        
