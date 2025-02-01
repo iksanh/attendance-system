@@ -6,8 +6,8 @@ from django.db import models
 #model for jabatan 
 class Pegawai(models.Model):
     nip = models.CharField(max_length=20, unique=True)
-    nama = models.CharField(max_length=50)
-    jabatan = models.CharField(max_length=50)
+    nama = models.CharField(max_length=100)
+    jabatan = models.CharField(max_length=100)
     grade = models.IntegerField()
 
     class Meta:
