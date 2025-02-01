@@ -12,3 +12,6 @@ class Pegawai(models.Model):
 
     class Meta:
         db_table = "m_pegawai"
+
+    def __str__(self):
+        return f"{self.nama}"

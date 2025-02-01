@@ -11,10 +11,11 @@ class PegawaiListCreateAPIView(generics.ListCreateAPIView):
 
 pegawai_list_create_view = PegawaiListCreateAPIView.as_view()
 
-class PegawaiRetriveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+class PegawaiRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Pegawai.objects.all()
     serializer_class = PegawaiSerializer
     lookup_field = 'id'
 
+    
 
-pegawai_retrive_update_delete_view = PegawaiRetriveUpdateDestroyAPIView.as_view()
+pegawai_retrive_update_delete_view = PegawaiRetrieveUpdateDestroyAPIView.as_view()
