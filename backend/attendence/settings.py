@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     #APPS 
     'pegawai',
+    'absensi',
 
     #LIBRARY
     'rest_framework'
