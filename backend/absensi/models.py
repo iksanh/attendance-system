@@ -2,6 +2,9 @@ from django.db import models
 from pegawai.models import Pegawai
 # Create your models here.
 
+class AbsensiDetailManager(models.Manager):
+    def search_by_tanggal_absen(self, tanggal_absen):
+        return self.filter(absensi__date=tanggal_absen)
 
 class Absensi (models.Model):
     pegawai  = models.ForeignKey(Pegawai, on_delete=models.CASCADE)
@@ -9,6 +12,8 @@ class Absensi (models.Model):
 
     class Meta:
         db_table  = "m_absensi"
+    
+    
 
 class MetodeAbsensi(models.TextChoices):
     EOFFICE = "e-office","E-Office"
@@ -25,3 +30,5 @@ class AbsensiDetail(models.Model):
     
     class Meta: 
         db_table = "m_absensi_detail"
+
+    objects = AbsensiDetailManager()

@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'absensi',
 
     #LIBRARY
-    'rest_framework'
+    'rest_framework',
+    'django_filters'
 ]
 
 MIDDLEWARE = [
