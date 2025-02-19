@@ -6,3 +6,5 @@ psycopg2
 python-dotenv
 djangorestframework-simplejwt
 django-filter
+pandas
+openpyxl
