@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from rest_framework import generics
+from rest_framework import generics, status
+from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Absensi, AbsensiDetail, AbsensiDetailManager
 from .serializers import AbsensiSerializer, AbsensiDetailSerializer
@@ -12,10 +13,9 @@ class AbsensiCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         tanggal_absen = self.request.query_params.get('tanggal_absen')
-        if tanggal_absen:
-            return AbsensiDetail.objects.search_by_tanggal_absen(tanggal_absen)
-        queryset = AbsensiDetail.objects.all()
-        return queryset
+        pegawai_id = self.request.query_params.get('pegawai_id')
+      
+        return AbsensiDetail.objects.search_by_tanggal_absen(tanggal_absen, pegawai_id)
     
     def get_serializer_class(self):
         #jika method post 
@@ -24,6 +24,13 @@ class AbsensiCreateView(generics.ListCreateAPIView):
             return AbsensiSerializer
         return AbsensiDetailSerializer
     
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 absensi_list_create_view = AbsensiCreateView.as_view()
 

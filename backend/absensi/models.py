@@ -1,10 +1,21 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from pegawai.models import Pegawai
 # Create your models here.
 
 class AbsensiDetailManager(models.Manager):
-    def search_by_tanggal_absen(self, tanggal_absen):
-        return self.filter(absensi__date=tanggal_absen)
+    def search_by_tanggal_absen(self, tanggal_absen=None, pegawai_id=None):
+        
+        queryset = self.all()
+        if tanggal_absen:
+
+            queryset = queryset.filter(absensi__date=tanggal_absen)
+
+        if pegawai_id:
+            print("test")
+            queryset = queryset.filter(absensi__pegawai_id=pegawai_id
+            )
+        return queryset
 
 class Absensi (models.Model):
     pegawai  = models.ForeignKey(Pegawai, on_delete=models.CASCADE)
@@ -31,4 +42,6 @@ class AbsensiDetail(models.Model):
     class Meta: 
         db_table = "m_absensi_detail"
 
+      
     objects = AbsensiDetailManager()
+

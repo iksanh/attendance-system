@@ -24,6 +24,9 @@ class AbsensiDetailSerializer(serializers.ModelSerializer):
 
     def get_tanggal_absen(self, obj):
         return obj.absensi.date
+    
+    
+    
 class AbsensiSerializer(serializers.ModelSerializer):
     absensi_detail = AbsensiDetailSerializer(write_only=True)
     pegawai_id = serializers.PrimaryKeyRelatedField(queryset=Pegawai.objects.all(), write_only=True, source='pegawai')
@@ -33,13 +36,29 @@ class AbsensiSerializer(serializers.ModelSerializer):
         model = Absensi
         fields = ['pegawai_id','pegawai', 'date', 'absensi_detail']
 
-   
+    #VALIDASI PEGAWAI, TANGGAL DAN METODE TIDAK BISA DOUBLE
+    def validate(self, data):
+
+        pegawai_id = data.get('pegawai', None).id
+        date = data.get('date')
+        metode = data.get('absensi_detail').get('metode')
+
+        print(data)
+
+    
+        if AbsensiDetail.objects.filter(absensi__pegawai__id=pegawai_id, absensi__date=date, metode=metode).exists():
+            raise serializers.ValidationError(f"pegawai dengan metode dan tanggal yang sama sudah di input")
+        
+        return data
+
+    
+        
     def create(self, validated_data):
         absensi_detail_data = validated_data.pop('absensi_detail')
 
         absensi = Absensi.objects.create(**validated_data)
 
-        print(absensi)
+       
         
         waktu_masuk = absensi_detail_data.get('waktu_masuk')
         waktu_keluar = absensi_detail_data.get('waktu_keluar')
