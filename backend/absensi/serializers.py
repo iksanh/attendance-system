@@ -74,8 +74,8 @@ class AbsensiSerializer(serializers.ModelSerializer):
             absensi=absensi,
             metode=absensi_detail_data.get('metode', MetodeAbsensi.MANUAL),
             waktu_masuk=waktu_masuk,
-            waktu_keluar=waktu_keluar,
-            jam_kerja=jam_kerja
+            waktu_keluar=waktu_keluar
+            
             )
 
 
