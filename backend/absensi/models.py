@@ -44,4 +44,3 @@ class AbsensiDetail(models.Model):
 
       
     objects = AbsensiDetailManager()
-

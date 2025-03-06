@@ -16,9 +16,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.shortcuts import render
+
+def index(request):
+    return render(request, 'index.html')
+
 
 urlpatterns = [
+    path('', index, name="index"),
     path('admin/', admin.site.urls),
-    path('api/pegawai/', include('pegawai.urls')),
-    path('api/absensi/', include('absensi.urls')),
+    path('custum_auth/', include('authentication.urls')),
+    path('api/pegawai/', include('pegawai.api.urls')),
+    path('api/absensi/', include('absensi.api.urls')),
 ]
