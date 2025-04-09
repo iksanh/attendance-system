@@ -1,0 +1,14 @@
+{% extends '_base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="card col-md-6 m-4">
+    <div class="card-header mb-4">
+        <h5>{% if form.instance.pk %}Edit{% else %}Tambah{% endif %} Pegawai</h5>
+    </div>
+    <form method="post" class="">
+        {% csrf_token %} {{form|crispy}}
+        <button type="submit" class="btn btn-primary mb-4">Simpan</button>
+        <a href="{% url 'pegawai-list' %}" class="btn  mb-4">Batal</a>
+    </form>
+</div>
+{% endblock %}

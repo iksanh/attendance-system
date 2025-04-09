@@ -1,0 +1,4 @@
+.highlighted {
+    background-color: #d1f7d1;  /* Light green background for highlight */
+    transition: background-color 0.3s ease;
+  }

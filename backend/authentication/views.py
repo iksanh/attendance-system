@@ -5,13 +5,12 @@ from django.urls import reverse_lazy
 
 
 class CustomLoginView(LoginView):
-    template_name = "auth/login.html"
+    template_name = "login.html"
     redirect_authenticated_user = True
     success_url = reverse_lazy("dashboard")
 
 
-    def get_success_url(self):
-        return self.get_success_url()
+  
 
 
 login_view  = CustomLoginView.as_view()

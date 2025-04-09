@@ -9,7 +9,7 @@ class Pegawai(models.Model):
     nama = models.CharField(max_length=100)
     jabatan = models.CharField(max_length=100)
     grade = models.IntegerField()
-
+    status = models.BooleanField(default=True)
     class Meta:
         db_table = "m_pegawai"
 
