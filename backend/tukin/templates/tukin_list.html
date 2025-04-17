@@ -1,0 +1,177 @@
+{% extends "_base.html" %}
+
+{% block content %}
+
+<!-- DOM/Jquery table start -->
+<div class="col-sm-12">
+  <div class="card">
+    <div class="card-header">
+      <div class="d-flex justify-content-between">
+        <h5>DAFTAR BESARAN TUNJANGAN KINERJA</h5>
+        <a href="#" onclick="showModalTukin()" class="btn btn-primary d-inline-flex align-item-center">
+          <i class="ti ti-plus f-18"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="dt-responsive">
+        <table id="dom-jqry" class="table table-striped ">
+          <thead>
+            <tr>
+              <th>NO</th>
+              <th>KELAS JABATAN/GRADE</th>
+              <th>TUNJANGAN KINERJA</th>
+              <th>AKSI</th>
+            </tr>
+          </thead>
+          <tbody>
+            {%if not tukins%}
+            <tr>
+              <td colspan="4" class="text-center">Data Tukin tidak tersedia</td>
+            </tr>
+            {%endif%}
+            {% for t in tukins %}
+            <tr id="tukin_{{ t.id }}">
+              <td> {{ forloop.counter }}</td>
+              <td>{{ t.kelas_jabatan }}</td>
+              <td>{{ t.jumlah_tunjangan }}</td>
+              <td class="text-center">
+                <ul class="list-inline me-auto mb-0">
+                  <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="View">
+                    <a href="#" class="avtar avtar-xs btn-link-secondary" data-bs-toggle="modal"
+                       data-bs-target="#user-modal">
+                      <i class="ti ti-eye f-18"></i>
+                    </a>
+                  </li>
+                  <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Edit">
+                    <a href="#" class="avtar avtar-xs btn-link-primary" onclick='showModalTukin({{ t.id }}, {{ t.kelas_jabatan }}, {{ t.jumlah_tunjangan }})''>
+                      <i class="ti ti-edit-circle f-18"></i>
+                    </a>
+                  </li>
+                  <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Delete">
+                    <a href="#" class="avtar avtar-xs btn-link-danger" onclick="deleteTukin({{t.id}})">
+                      <i class="ti ti-trash f-18"></i>
+                    </a>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalTukin" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formTukin">
+          {% csrf_token %}
+          {{ form.as_p }}
+      </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let modalTukin = document.getElementById("modalTukin")
+  let modalTitle = document.querySelector(".modal-title")
+  let modalBody = document.querySelector(".modal-body")
+  let modalFooter = document.querySelector(".modal-footer")
+  let uiKelasJabatan = document.getElementById("id_kelas_jabatan")
+  let uiJumlahTunjangan = document.getElementById("id_jumlah_tunjangan")
+  let csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+  function showModalTukin(id="", kelas_jabatan="", jumlah_tunjangan=""){
+    let modal = new bootstrap.Modal(modalTukin);
+    let title = "Tambah Tunjangan Kinerja"
+    uiKelasJabatan.value = kelas_jabatan
+    uiJumlahTunjangan.value = jumlah_tunjangan
+    let buttonSave = `<button type="button" class="btn btn-primary" id="btnSaveTukin" >Simpan</button>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    `
+    modalTitle.textContent= title
+    
+    modalFooter.innerHTML =buttonSave
+    modal.show();
+
+    setTimeout(() => {
+    document.getElementById("btnSaveTukin").addEventListener("click", async () => {
+      const form = document.getElementById("formTukin");
+      const formData = new FormData(form);
+      
+      
+
+      const payload = {
+        kelas_jabatan: formData.get("kelas_jabatan"),
+        jumlah_tunjangan: formData.get("jumlah_tunjangan"),
+      };
+
+      console.log(csrfToken)
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/api/tukin/${ !id  ? "" : id+"/"}`, {
+          method: !id ? "POST" : "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            'X-CSRFToken': csrfToken
+          },
+
+          body: JSON.stringify(payload),
+        });
+
+        if (response.ok) {
+          alert(`Data berhasil ${id ? "diupdate" : "disimpan!"} `);
+          modal.hide();
+          form.reset();
+          location.reload()
+        } else {
+          const errorData = await response.json();
+          alert("Gagal menyimpan: " + JSON.stringify(errorData));
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Terjadi kesalahan");
+      }
+    });
+  }, 100); // slight delay to ensure modal content is rendered
+
+  }
+
+  async function deleteTukin(id) {
+    try {
+    const response = await fetch(`http://127.0.0.1:8000/api/tukin/${id}/`, {
+      method: "DELETE",
+      headers: {
+            'X-CSRFToken': csrfToken
+          },
+    });
+
+    if (response.ok) {
+      alert("Data berhasil dihapus!");
+      location.reload()
+    } else {
+      const error = await response.json();
+      alert("Gagal menghapus: " + JSON.stringify(error));
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Terjadi kesalahan saat menghapus data.");
+  }
+
+    
+  }  
+  </script>
+
+
+{% endblock content %}

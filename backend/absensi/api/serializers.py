@@ -80,3 +80,21 @@ class AbsensiSerializer(serializers.ModelSerializer):
 
 
         return absensi
+
+class PegawaiAbsensiSerializer(serializers.Serializer):
+    id = serializers.CharField(max_length=20)
+    nama = serializers.CharField(max_length=100)
+    date = serializers.DateField()
+    metode = serializers.CharField(max_length=30)
+    waktu_masuk = serializers.TimeField()
+    waktu_keluar = serializers.TimeField()
+
+class AbsensiPivotSerializer(serializers.Serializer):
+    pegawai_id = serializers.IntegerField()
+    nama = serializers.CharField()
+    manual_masuk = serializers.TimeField(allow_null=True)
+    manual_keluar = serializers.TimeField(allow_null=True)
+    eoffice_masuk = serializers.TimeField(allow_null=True)
+    eoffice_keluar = serializers.TimeField(allow_null=True)
+    finger_masuk = serializers.TimeField(allow_null=True)
+    finger_keluar = serializers.TimeField(allow_null=True)

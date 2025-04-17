@@ -1,45 +1,103 @@
 {% extends '_base.html' %}
 
 {% block content %}
+<div class="d-flex justify-content-end mb-3">
+    <a href="{% url 'absensi-create'%}" class="btn btn-primary d-inline-flex align-item-center">
+        <i class="ti ti-plus f-18"></i> Tambah 
+      </a>
+</div>
 <div class="card">
     <div class="card-header">
-
-        <div class="d-flex justify-content-between">
-            <h5>DATA ABSENISI</h5>
-            <a href="{% url 'absensi-create'%}" class="btn btn-primary d-inline-flex align-item-center">
-              <i class="ti ti-plus f-18"></i> Tambah 
-            </a>
+      <h5>Cari Data Absensi Pegawai</h5>
+    </div>
+    <div class="card-body">
+      <form>
+        <div class="row">
+          <div class="col-lg-6">
+            <div class="form-group">
+              <label class="form-label">Tanggal</label>
+              <input type="date" class="form-control" id="id_tanggal__absensi">
+            </div>
           </div>
+        </div>
+        
+      </form>
+    </div>
+  </div>
+<div class="card">
+    <div class="card-header">
+            <h5>DATA ABSENSI </h5>
     </div>
     <div class="card-body">
 
-    
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Pegawai</th>
-                <th>Tanggal</th>
-                <th>Metode</th>
-                <th>Jam Masuk</th>
-                <th>Jam Keluar</th>
-                <th>Jam Kerja</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for absensi in absensi_list %}
-            <tr>
-                <td>{{ absensi.pegawai }}</td>
-                <td>{{ absensi.date }}</td>
-                {% with absensi.absensidetail_set.first as detail %}
-                <td>{{ detail.metode }}</td>
-                <td>{{ detail.waktu_masuk }}</td>
-                <td>{{ detail.waktu_keluar }}</td>
-                <td>{{ detail.jam_kerja }}</td>
-                {% endwith %}
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div id="id_data__absensi"></div>
 </div>
 </div>
+<script>
+    let tanggal_absensi = document.getElementById("id_tanggal__absensi");
+    let uiDataAbsensi = document.getElementById("id_data__absensi");
+
+    tanggal_absensi.addEventListener("change", function(){
+        let getTanggalAbsensi = tanggal_absensi.value
+        const APIURL = `http://127.0.0.1:8000/api/absensi/pivot_absensi/?tanggal=${getTanggalAbsensi}`
+        fetch(APIURL)
+        uiDataAbsensi.innerHTML = `<div>data absensi tanggal ${getTanggalAbsensi}</div>`
+
+        fetch(APIURL)
+    .then((response) => {
+      if (!response.ok) throw new Error("Network response was not ok");
+      return response.json();
+    })
+    .then((data) => {
+      renderTableAbsensi(data)
+    })
+    .catch((error) => {
+      console.error("Error fetching absensi data:", error);
+      tableBody.innerHTML = `<tr><td colspan="7">Failed to load data</td></tr>`;
+    });
+
+    })
+
+    function renderTableAbsensi(data){
+        let table = `
+        <table id="absensiTable" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th rowspan="2">Pegawai</th>
+                    <th colspan="2" class="text-center">Manual</th>
+                    <th colspan="2" class="text-center">E-Office</th>
+                    <th colspan="2" class="text-center">Finger</th>
+                </tr>
+                <tr>
+                    <th>Masuk</th>
+                    <th>Keluar</th>
+                    <th>Masuk</th>
+                    <th>Keluar</th>
+                    <th>Masuk</th>
+                    <th>Keluar</th>
+                </tr>
+            </thead>
+            <tbody>
+       `
+       if(data){
+        data.forEach((item) => {
+        table += `
+          <tr>
+            <td>${item.nama}</td>
+            <td>${item.manual_masuk || "-"}</td>
+            <td>${item.manual_keluar || "-"}</td>
+            <td>${item.eoffice_masuk || "-"}</td>
+            <td>${item.eoffice_keluar || "-"}</td>
+            <td>${item.finger_masuk || "-"}</td>
+            <td>${item.finger_keluar || "-"}</td>
+          </tr>
+        `;
+        table += '</tbody>'
+        
+      });
+       }
+       uiDataAbsensi.innerHTML = table
+    }
+
+</script>
 {% endblock %}

@@ -1,22 +1,199 @@
-{% extends '_base.html' %}
+{% extends '_base.html' %} {% block content %}
 
-{% block content %}
 <div class="container">
-    <div class="card">
-        <div class="card-header"><h5>Tambah Absensi</h5></div>
-    </div>
+  <div class="card">
+    <div class="card-header"><h5 id="title_form">Tambah Absensi</h5></div>
     <div class="card-body">
-
-        <form method="post">
-            {% csrf_token %}
-            <div class="form-group">
-                {{ form.as_p }}
-            </div>
-            <div class="form-group">
-                {{ absensi_detail_form.as_p }}
-            </div>
-            <button type="submit" class="btn btn-primary">Simpan</button>
-        </form>
+      <form>
+        {% csrf_token %}
+        <h5 class="mb-3">Pilih Metode</h5>
+        <div class="form-group row">
+          <label class="col-lg-2 col-form-label text-lg-start"
+            >Tanggal absensi:</label
+          >
+          <div class="col-lg-6">{{ form.date}}</div>
+        </div>
+        <div class="form-group row">
+          <label class="col-lg-2 col-form-label text-lg-start"
+            >Metode absensi:</label
+          >
+          <div class="col-lg-6">{{ form.metode}}</div>
+        </div>
+        <div id="type_absensi">
+          <hr class="my-4" />
+          <h5 class="mb-3">Absensi</h5>
+          <div id="input_absensi"></div>
+        </div>
+        <div id="upload_file"></div>
+      </form>
     </div>
+  </div>
 </div>
+<script>
+  const tanggalAbsensi = document.getElementById("id_date");
+  const metodeAbsensi = document.getElementById("id_metode");
+  const typeAbsensi = document.getElementById("type_absensi");
+  const inputAbsensi = document.getElementById("input_absensi");
+  const titleForm = document.getElementById("title_form");
+  let getTitleForm = titleForm.value;
+
+  function fetchAbsensiData() {
+    let selectedTanggalAbsensi = tanggalAbsensi.value;
+    console.log(selectedTanggalAbsensi);
+    fetch(
+      `http://127.0.0.1:8000/api/absensi/pegawai_absensi/?date=${selectedTanggalAbsensi}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data); // Render table when data is received
+        renderFormAbsensiPegawai(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching absensi data:", error);
+      });
+  }
+
+  function renderFormUploadAbsensiPegawai() {
+    let formUploadAbsensiPegawai = `
+    <div class="input-group mb-3">
+                    <input type="file" class="form-control" id="input_file_excel">
+                    <label class="input-group-text" for="inputGroupFile02">Upload</label>
+                  </div>
+                  <button type="button" class="btn btn-primary mb-4" onclick="handleSaveUpload()">Simpan</button>
+    `;
+    inputAbsensi.innerHTML = formUploadAbsensiPegawai;
+  }
+
+  function renderFormAbsensiPegawai(data) {
+    let formAbsensi = `
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Pegawai</th>
+                        <th>Jam Masuk</th>
+                        <th>Jam Keluar</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+   
+            
+            `;
+    let tableRow = "";
+    data.forEach((item) => {
+      formAbsensi += `
+                    <tr>
+                        <td>${item.nama}</td>
+                    <td><input type="time" class="form-control" id="waktu_masuk_${
+                      item.id
+                    }" name="waktu_masuk_${item.id}" value="${
+        item.waktu_masuk || ""
+      }" /></td>
+                    <td><input type="time" class="form-control" id="waktu_keluar_${
+                      item.id
+                    }" name="waktu_keluar_${item.id}" value="${
+        item.waktu_keluar || ""
+      }" /></td>
+                    <td><button type="button" class="btn btn-primary mb-4" onclick="handleSave('${
+                      item.id
+                    }')">Simpan</button></td> 
+                    </tr>
+                `;
+    });
+    formAbsensi += `</tbody></table>`;
+
+    inputAbsensi.innerHTML = formAbsensi;
+  }
+  metodeAbsensi.addEventListener("change", function () {
+    const selectedMetode = metodeAbsensi.value;
+    let selectedTanggalAbsensi = tanggalAbsensi.value;
+
+    if (!selectedTanggalAbsensi) {
+      alert("pilih tanggal dulu");
+      tanggalAbsensi.focus();
+      return;
+    }
+
+    if (selectedMetode === "manual") fetchAbsensiData();
+    if (selectedMetode === "e-office") renderFormUploadAbsensiPegawai();
+  });
+
+  function handleSaveUpload() {
+    const URLAPI = "http://127.0.0.1:8000/api/absensi/upload_excel/";
+    let tanggalAbsensiValue = tanggalAbsensi.value;
+    let metodeAbsensiValue = metodeAbsensi.value;
+    let input = document.getElementById("input_file_excel");
+    let file = input.files[0];
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("date", tanggalAbsensiValue);
+    formData.append("metode", metodeAbsensiValue);
+
+    
+
+    if (file) {
+      console.log("File name:", file.name);
+      console.log("File size:", file.size);
+      console.log("File type:", file.type);
+
+      
+        fetch(URLAPI, {
+          method: "POST",
+          headers: {
+             "X-CSRFToken": getCsrfToken(), // If you're using CSRF protection (for Django)
+          },
+          body: formData,
+        }).then((response) => response.json()).then((data)=> {
+          console.log(data)
+        }).catch((error)=>{console.error(error)})
+      
+    } else {
+      alert("Pilh file dulu");
+      input.focus();
+    }
+  }
+  function handleSave(id) {
+    console.log(id);
+    const waktuMasuk = document.getElementById(`waktu_masuk_${id}`).value;
+    const waktuKeluar = document.getElementById(`waktu_keluar_${id}`).value;
+
+    // Create the payload to send to the server
+
+    const URLAPI = "http://127.0.0.1:8000/api/absensi/pegawai_absensi/";
+
+    const payload = {
+      id: id,
+      waktu_masuk: waktuMasuk,
+      waktu_keluar: waktuKeluar,
+      metode: "manual",
+      date: tanggalAbsensi.value,
+    };
+
+    fetch(URLAPI, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCsrfToken(), // If you're using CSRF protection (for Django)
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        alert(data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("An error occurred while saving the data.");
+      });
+  }
+  function getCsrfToken() {
+    const csrfToken = document.querySelector(
+      "[name=csrfmiddlewaretoken]"
+    ).value;
+    return csrfToken;
+  }
+</script>
+
 {% endblock %}

@@ -31,6 +31,8 @@ urlpatterns = [
     path('authectication/', include('authentication.urls')),
     path('absensi/', include('absensi.urls')),
     path('pegawai/', include('pegawai.urls')),
+    path('tukin/', include('tukin.urls')),
     path('api/pegawai/', include('pegawai.api.urls')),
     path('api/absensi/', include('absensi.api.urls')),
+    path('api/tukin/', include('tukin.api.urls')),
 ]

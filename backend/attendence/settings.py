@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'pegawai',
     'absensi',
     'authentication',
+    'tukin',
 
     #LIBRARY
     'rest_framework',
